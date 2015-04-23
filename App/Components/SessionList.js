@@ -8,6 +8,8 @@ var React = require('react-native');
 var Parse = require('parse').Parse;
 var ParseReact = require('parse-react');
 
+var SessionDetail = require('../Components/SessionDetail');
+
 var ParseConfiguration = {
 	'applicationId': "GRIoAKWUExfsT1q37Uyt66h4Lmx9ovvBAv2qigIw",
 	'javascriptKey': "VVKntpb3zNpAgAhcEJHapDwKMVUKhIdX5QG0PVxf"
@@ -35,17 +37,25 @@ var MessageList = React.createClass({
     };
   },
 
+	onSelect : function(session) {
+    this.props.navigator.push({
+      //title: this.getTitle(earthquake.humanReadableLocation),
+      component: SessionDetail,
+      passProps: {session},
+    });
+	},
+
   renderRow: function(session) {
     console.log(session);
     var t = session.tutor;
     var u = session.user;
     var p = session.place
     return (
-      <TouchableHighlight >
-        <View>
-          <Text style={styles.account}>{u.first_name + " " + u.last_name}</Text>
-            <Text style={styles.account}>{t.first_name + " " + t.last_name}</Text>
-          <Text style={styles.account}>{p.Name + " " + p.Location}</Text>
+      <TouchableHighlight onPress={ () => this.onSelect(session)}>
+        <View style={styles.row}>
+          <Text  style={styles.listText_large} >{u.first_name + " " + u.last_name}</Text>
+            <Text style={styles.listText_large} >{t.first_name + " " + t.last_name}</Text>
+          <Text style={styles.listText}>{p.Name + " " + p.Location}</Text>
         </View>
       </TouchableHighlight>
     );
@@ -65,7 +75,9 @@ var SessionList =  React.createClass({
 
     mixins: [ParseReact.Mixin],
 
-
+		addNewSession : function() {
+			alert("Clicked Add New Session");
+		},
     observe: function() {
       return {
         tutorSessions: (new Parse.Query("TutorSession").include(["place,tutor,user"]))
@@ -103,24 +115,37 @@ var SessionList =  React.createClass({
         </View>)
       } else {
         console.log("Drawing List " + this.data.tutorSessions.length);
-        return (<MessageList dataArray={this.data.tutorSessions}/>)
+        return (<MessageList
+										navigator={this.props.navigator}
+					 					dataArray={this.data.tutorSessions}/>)
       }
     }
 
   });
 
   var styles = StyleSheet.create({
+		row : {
+			paddingTop: 10,
+	    paddingBottom: 10,
+			paddingLeft: 5,
+			borderBottomColor: '#eeeeee',
+			borderBottomWidth: 1,
+		},
     container: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: '#F5FCFF',
     },
-    welcome: {
-      fontSize: 20,
-      textAlign: 'center',
-      margin: 10,
+    listText: {
+      fontSize: 16,
+      textAlign: 'left',
+			color : 'grey'
     },
+		listText_large: {
+			fontSize: 18,
+			textAlign: 'left',
+		},
     instructions: {
       textAlign: 'center',
       color: '#333333',

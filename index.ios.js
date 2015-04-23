@@ -6,6 +6,7 @@
 
 var React = require('react-native');
 var SessionList = require('./App/Components/SessionList');
+var CreateSession = require('./App/Components/CreateSession');
 
 
 var {
@@ -23,13 +24,26 @@ var styles = StyleSheet.create({
 });
 
 class ReactParseExample extends React.Component{
+
+  addNewSession() {
+    this.refs.nav.push({
+        component: CreateSession,
+        rightButtonTitle: 'Cancel',
+        leftButtonTitle: null,
+        passProps: {session : {}},
+      });
+  }
+
   render() {
     return (
       <NavigatorIOS
-      style={styles.container}
+        style={styles.container}
+        ref="nav"
         initialRoute={{
           title: 'Tutor Manager',
-          component: SessionList
+          component: SessionList,
+          rightButtonTitle: 'New Session',
+          onRightButtonPress: () => this.addNewSession(),
         }} />
     );
   }
