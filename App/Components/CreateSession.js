@@ -29,6 +29,10 @@ var CreateSession = React.createClass({
     };
   },
 
+  onDateChange: function(date) {
+    this.setState({date: date});
+  },
+
   render: function() {
   //  alert(JSON.stringify(this.state.annotations));
     return (
@@ -38,7 +42,7 @@ var CreateSession = React.createClass({
           date={this.state.date}
           mode="dateTime"
           timeZoneOffsetInMinutes={this.state.timeZoneOffsetInHours * 60}
-          //onDateChange={this.onDateChange}
+          onDateChange={this.onDateChange}
           minuteInterval={10}
         />
       </View>
