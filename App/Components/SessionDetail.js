@@ -2,6 +2,8 @@
 */
 'use strict';
 var React = require('react-native');
+var ActionSheetIOS = require('ActionSheetIOS');
+
 var {
   StyleSheet,
   ScrollView,
@@ -10,6 +12,7 @@ var {
 
 var moment = require('moment');
 var TextLabelPanel = require('../Components/TextLabelPanel');
+var Button = require('../Components/Button');
 
 var SessionDetail = React.createClass({
 
@@ -31,6 +34,25 @@ var SessionDetail = React.createClass({
   },
 
 
+  showShareActionSheet : function() {
+    ActionSheetIOS.showShareActionSheetWithOptions({
+      url: 'https://code.facebook.com',
+    },
+    (error) => {
+      console.error(error);
+    },
+    (success, method) => {
+      var text;
+      if (success) {
+        text = `Shared via ${method}`;
+      } else {
+        text = 'You didn\'t share';
+      }
+      this.setState({text})
+    });
+  },
+
+
   render: function() {
     //  alert(JSON.stringify(this.state.annotations));
     return (
@@ -40,6 +62,9 @@ var SessionDetail = React.createClass({
       <TextLabelPanel label="Name" text={this.props.session.place.Name} />
       <TextLabelPanel label="Location" text={this.props.session.place.Location} />
       <TextLabelPanel label="When" text={this.state.relativeTime} />
+        <Button
+          onPress={() => this.showShareActionSheet()}
+          label="Share Session Information" />
       </ScrollView>
     );
   },

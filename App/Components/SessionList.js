@@ -20,6 +20,7 @@ var {
   StyleSheet,
   ListView,
   TouchableHighlight,
+  ActivityIndicatorIOS,
   Text,
   View,
 } = React;
@@ -62,12 +63,14 @@ var MessageList = React.createClass({
   },
 
   render: function() {
-    return ( <ListView
+    return ( 
+      <ListView
       ref="listview"
       dataSource={this.state.dataSource}
-      renderRow={this.renderRow}
-      />)
+      renderRow={this.renderRow} /> 
+      )
     }
+
   });
 
 
@@ -89,7 +92,7 @@ var SessionList =  React.createClass({
     },
 
     getInitialState: function() {
-      var ds = new ListView.DataSource({rowHasChanged:this.rowHasChanged /*(r1, r2) => r1 !== r2*/});
+      var ds = new ListView.DataSource({rowHasChanged:(r1, r2) => r1 !== r2});
       return {
         dataSource: ds.cloneWithRows(["aaron"]),
         loading : true
@@ -110,9 +113,12 @@ var SessionList =  React.createClass({
       }
 
       if (this.pendingQueries().length) {
-        return (      <View style={[styles.container, styles.centerText]}>
-          <Text>WAITING...</Text>
-        </View>)
+        return (      
+          <View style={[styles.container, styles.centerText]}>
+            <ActivityIndicatorIOS
+              style={[styles.centering, {backgroundColor: '#eeeeee', height: 40}]} />
+          </View>
+        )
       } else {
         console.log("Drawing List " + this.data.tutorSessions.length);
         return (<MessageList
