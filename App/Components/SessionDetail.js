@@ -19,13 +19,13 @@ var SessionDetail = React.createClass({
       annotations: [{
         longitude: this.props.session.place.coords.longitude,
         latitude: this.props.session.place.coords.latitude,
-        title: 'You Are Here',
+        title: 'You Are Here'
       }],
       mapRegion : {
         latitude: this.props.session.place.coords.latitude,
         longitude: this.props.session.place.coords.longitude,
         latitudeDelta: .01,
-        longitudeDelta: .01,
+        longitudeDelta: .01
       }
     };
   },
@@ -42,13 +42,13 @@ var SessionDetail = React.createClass({
       <TextLabelPanel label="When" text={this.state.relativeTime} />
       </ScrollView>
     );
-  },
+  }
 });
 
 var styles = StyleSheet.create({
   map: {
-    height: 250,
-  },
+    height: 250
+  }
 });
 
 module.exports = SessionDetail;
