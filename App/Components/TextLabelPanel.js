@@ -12,13 +12,12 @@ var {
 
 var TextLabelPanel = React.createClass({
     render: function () {
-        debugger;
         return (
-            <TouchableOpacity onPress={this.props.onPress}>
+            <TouchableOpacity onPress={this.props.__onPress}>
                 <View style={styles.panel} >
                     <Text style={styles.panel__label}>{this.props.label}</Text>
                     <Text style={styles.panel__text}>
-          {this.props.text}
+          {this.props.text + ""}
                     </Text>
                 </View>
             </TouchableOpacity>

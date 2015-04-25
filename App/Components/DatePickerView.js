@@ -10,8 +10,6 @@ var {
     DatePickerIOS,
     } = React;
 
-var moment = require('moment');
-var NavigatorNavigationBar = require('NavigatorNavigationBar');
 
 var DatePickerView = React.createClass({
 
@@ -36,11 +34,9 @@ var DatePickerView = React.createClass({
                 <Text style={styles.text}>IN CREATE SESSION</Text>
                 <DatePickerIOS
                     date={this.state.date}
-                    mode="dateTime"
+                    mode="datetime"
                     timeZoneOffsetInMinutes={this.state.timeZoneOffsetInHours * 60}
-                    //onDateChange={this.onDateChange}
-                    minuteInterval={10}
-                />
+                    minuteInterval={10} />
             </View>
         )
     }
@@ -51,7 +47,8 @@ var styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         // alignItems: 'center',
-        backgroundColor: 'green'
+        backgroundColor: 'transparent',
+        height : 100
     },
     text: {},
     mainView: {
