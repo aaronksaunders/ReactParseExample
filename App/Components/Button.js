@@ -1,3 +1,8 @@
+/**
+ *
+ * @flow
+ */
+
 'use strict';
 
 var React = require('react-native');
@@ -13,7 +18,7 @@ var Button = React.createClass({
     return (
       <TouchableHighlight
         underlayColor={'white'}
-        style={styles.button}
+        style={[styles.button]}
         onPress={this.props.onPress}>
         <Text style={styles.buttonLabel}>
           {this.props.label}
@@ -25,7 +30,6 @@ var Button = React.createClass({
 
 var styles = StyleSheet.create({
   button: {
-  	flex: 1,
   	flexDirection: 'row',
   	margin : 20,
     padding: 10,

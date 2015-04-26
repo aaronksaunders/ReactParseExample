@@ -4,6 +4,9 @@
  *
  * multiline text input not unsupported
  * @see ttps://github.com/facebook/react-native/issues/279
+ *
+ *
+ * @flow
  */
 'use strict';
 
@@ -21,6 +24,9 @@ var moment = require('moment');
 var TextLabelPanel = require('../Components/TextLabelPanel');
 var InputLabelPanel = require('../Components/InputLabelPanel');
 var DatePickerView = require('../Components/DatePickerView');
+var PlaceList = require('../Components/PlaceList');
+var UserList = require('../Components/UserList');
+var Button = require('../Components/Button');
 var NavigationBar = require('react-native-navbar');
 
 
@@ -36,26 +42,72 @@ var CreateSession = React.createClass({
         return {
             date: this.props.date,
             timeZoneOffsetInHours: this.props.timeZoneOffsetInHours,
-            selectedDate : new Date()
+            selectedDate: new Date(),
+            selectedUser: "",
+            selectedPlace: ""
         };
     },
 
-    onDateChange: function (date) {
+    showUserPicker: function () {
+
+        this.props.navigator.push({
+            title: 'Pick User',
+            sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
+            component: UserList,
+            navigationBar: <NavigationBar
+                title="Pick Tutor" />,
+            passProps: {handleSelectedRow: this.handleSelectedUser}
+        })
+    },
+
+    handleSelectedPlace: function (_selectedPlace) {
         this.setState({
-            selectedDate: date,
-            date: date
+            selectedPlace: _selectedPlace
         });
     },
 
-    showDatePicker : function() {
+    handleSelectedUser: function (_selectedUser) {
+        this.setState({
+            selectedUser: _selectedUser
+        });
+    },
+
+    handleSelectedDate: function (_selectedDate) {
+        this.setState({
+            selectedDate: _selectedDate
+        });
+    },
+
+    showPlacePicker: function () {
+
+        this.props.navigator.push({
+            title: 'Pick User',
+            sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
+            component: PlaceList,
+            navigationBar: <NavigationBar
+                title="Pick Tutor Location" />,
+            passProps: {handleSelectedRow: this.handleSelectedPlace}
+        })
+    },
+
+    showDatePicker: function () {
 
         this.props.navigator.push({
             title: 'Pick Date',
             sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
             component: DatePickerView,
             navigationBar: <NavigationBar
-                title="Initial View" />
+                title="Initial View" />,
+            passProps: {handleSelectedDate: this.handleSelectedDate}
         })
+    },
+
+    displayUserName: function (_user) {
+        return _user ? _user.first_name + " " + _user.last_name : null;
+    },
+
+    saveNewSession: function () {
+
     },
 
     render: function () {
@@ -63,10 +115,13 @@ var CreateSession = React.createClass({
         return (
             <View style={styles.view}>
                 <InputLabelPanel label="Session Name" text={this.props} />
-                <TextLabelPanel label="Session Tutor" text={this.props + ""}/>
-                <TextLabelPanel label="Session Location" text={this.props + ""}/>
+                <TextLabelPanel label="Session Tutor" text={this.displayUserName(this.state.selectedUser) || ""}   __onPress={this.showUserPicker} />
+                <TextLabelPanel label="Session Location" text={this.state.selectedPlace.Name + ""}   __onPress={this.showPlacePicker} />
                 <TextLabelPanel label="Session Time" text={this.state.selectedDate + ""}  __onPress={this.showDatePicker} />
                 <InputLabelPanel label="Notes" text={this.props} />
+                <Button
+                    onPress={() => this.saveNewSession()}
+                    label="Save New Session" />
             </View>
         )
     }

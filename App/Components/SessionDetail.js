@@ -1,5 +1,7 @@
 /**
-*/
+ *
+ * @flow
+ */
 'use strict';
 var React = require('react-native');
 var ActionSheetIOS = require('ActionSheetIOS');

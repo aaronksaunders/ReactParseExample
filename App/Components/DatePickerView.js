@@ -1,4 +1,5 @@
 /**
+ * @flow
  */
 'use strict';
 
@@ -10,7 +11,7 @@ var {
     DatePickerIOS,
     } = React;
 
-
+var Button = require('../Components/Button');
 var DatePickerView = React.createClass({
 
     getDefaultProps: function () {
@@ -27,6 +28,14 @@ var DatePickerView = React.createClass({
         };
     },
 
+    onDateChange: function(date) {
+        this.setState({date: date});
+    },
+
+    onSaveSelect: function () {
+        this.props.handleSelectedDate(this.state.date);
+        this.props.navigator.pop();
+    },
 
     render: function () {
         return (
@@ -36,8 +45,11 @@ var DatePickerView = React.createClass({
                     date={this.state.date}
                     mode="datetime"
                     timeZoneOffsetInMinutes={this.state.timeZoneOffsetInHours * 60}
+                    onDateChange={this.onDateChange}
                     minuteInterval={10} />
+                <Button onPress={this.onSaveSelect} label="Save Date" />
             </View>
+
         )
     }
 });

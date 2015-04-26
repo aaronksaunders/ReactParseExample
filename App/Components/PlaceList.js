@@ -27,11 +27,10 @@ var {
     View,
     } = React;
 
-debugger;
 Parse.initialize(ParseConfiguration.applicationId, ParseConfiguration.javascriptKey);
 var NavigationBar = require('react-native-navbar');
 
-var MessageList = React.createClass({
+var PlaceListView = React.createClass({
     getInitialState: function () {
         var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
         return {
@@ -40,33 +39,18 @@ var MessageList = React.createClass({
         };
     },
 
-    onSelect: function (session) {
-
-        if (true) {
-            this.props.navigator.push({
-                //title: this.getTitle(earthquake.humanReadableLocation),
-                component: SessionDetail,
-                passProps: {session: session, navigator: this.props.navigator},
-                navigationBar: <NavigationBar
-                    title ='Session Detail' />
-            });
-        } else {
-            //  ReactElement.render();
-        }
-
+    onSelect: function (selectedItem) {
+        this.props.handleSelectedRow(selectedItem);
+        this.props.navigator.pop();
     },
 
-    renderRow: function (session) {
-        console.log(session);
-        var t = session.tutor;
-        var u = session.user;
-        var p = session.place
+    renderRow: function (place) {
+        console.log(place);
         return (
-            <TouchableHighlight onPress={ () => this.onSelect(session)}>
+            <TouchableHighlight onPress={ () => this.onSelect(place)}>
                 <View style={styles.row}>
-                    <Text  style={styles.listText_large} >{u.first_name + " " + u.last_name}</Text>
-                    <Text style={styles.listText_large} >{t.first_name + " " + t.last_name}</Text>
-                    <Text style={styles.listText}>{p.Name + " " + p.Location}</Text>
+                    <Text  style={styles.listText_large} >{place.Name}</Text>
+                    <Text  style={styles.listText_large} >{place.Location}</Text>
                 </View>
             </TouchableHighlight>
         );
@@ -75,7 +59,7 @@ var MessageList = React.createClass({
     render: function () {
         return (
             <ListView
-                ref="listview"
+                ref="place_listview"
                 dataSource={this.state.dataSource}
                 renderRow={this.renderRow} />
         )
@@ -84,16 +68,14 @@ var MessageList = React.createClass({
 });
 
 
-var SessionList = React.createClass({
+var PlaceList = React.createClass({
 
     mixins: [ParseReact.Mixin],
 
-    addNewSession: function () {
-        alert("Clicked Add New Session");
-    },
+
     observe: function () {
         return {
-            tutorSessions: (new Parse.Query("TutorSession").include(["place,tutor,user"]))
+            places: (new Parse.Query("Place"))
         };
     },
 
@@ -104,7 +86,7 @@ var SessionList = React.createClass({
     getInitialState: function () {
         var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
         return {
-            dataSource: ds.cloneWithRows(["aaron"]),
+            dataSource: ds.cloneWithRows([]),
             loading: true
         };
     },
@@ -112,7 +94,7 @@ var SessionList = React.createClass({
     componentDidMount: function () {
         this.setState({
             dataSource: this.state.dataSource.cloneWithRows(
-                this.data.tutorSessions
+                this.data.places
             )
         });
     },
@@ -132,10 +114,11 @@ var SessionList = React.createClass({
                 </View>
             )
         } else {
-            console.log("Drawing List " + this.data.tutorSessions.length);
-            return (<MessageList
+            console.log("Drawing List " + this.data.places.length);
+            return (<PlaceListView
                 navigator={this.props.navigator}
-                dataArray={this.data.tutorSessions}/>)
+                handleSelectedRow={this.props.handleSelectedRow}
+                dataArray={this.data.places}/>)
         }
     }
 
@@ -172,4 +155,4 @@ var styles = StyleSheet.create({
 });
 
 
-module.exports = SessionList;
+module.exports = PlaceList;
