@@ -2,7 +2,7 @@
  * Sample React Native App
  * https://github.com/facebook/react-native
  *
- * @flow
+ *
  */
 'use strict';
 
@@ -27,7 +27,6 @@ var {
     View,
     } = React;
 
-debugger;
 Parse.initialize(ParseConfiguration.applicationId, ParseConfiguration.javascriptKey);
 var NavigationBar = require('react-native-navbar');
 
@@ -95,6 +94,10 @@ var SessionList = React.createClass({
         return {
             tutorSessions: (new Parse.Query("TutorSession").include(["place,tutor,user"]))
         };
+    },
+
+    _refresh: function() {
+        this.refreshQueries('tutorSessions');
     },
 
     rowHasChanged: function (r1, r2) {

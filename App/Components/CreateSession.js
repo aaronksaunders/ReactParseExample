@@ -3,14 +3,18 @@
  * @see https://github.com/gcanti/tcomb-form-native
  *
  * multiline text input not unsupported
- * @see ttps://github.com/facebook/react-native/issues/279
+ * @see https://github.com/facebook/react-native/issues/279
  *
  *
- * @flow
  */
 'use strict';
 
 var React = require('react-native');
+
+var Parse = require('parse').Parse;
+var ParseReact = require('parse-react');
+
+
 var {
     StyleSheet,
     Text,
@@ -30,102 +34,161 @@ var Button = require('../Components/Button');
 var NavigationBar = require('react-native-navbar');
 
 
+var ParseConfiguration = {
+    'applicationId': "GRIoAKWUExfsT1q37Uyt66h4Lmx9ovvBAv2qigIw",
+    'javascriptKey': "VVKntpb3zNpAgAhcEJHapDwKMVUKhIdX5QG0PVxf"
+};
+
+Parse.initialize(ParseConfiguration.applicationId, ParseConfiguration.javascriptKey);
+
+
 var CreateSession = React.createClass({
-    getDefaultProps: function () {
-        return {
-            date: new Date(),
-            timeZoneOffsetInHours: (-1) * (new Date()).getTimezoneOffset() / 60
-        };
-    },
 
-    getInitialState: function () {
-        return {
-            date: this.props.date,
-            timeZoneOffsetInHours: this.props.timeZoneOffsetInHours,
-            selectedDate: new Date(),
-            selectedUser: "",
-            selectedPlace: ""
-        };
-    },
+        getDefaultProps: function () {
+            return {
+                date: new Date(),
+                timeZoneOffsetInHours: (-1) * (new Date()).getTimezoneOffset() / 60
+            };
+        },
 
-    showUserPicker: function () {
+        getInitialState: function () {
+            return {
+                date: this.props.date,
+                timeZoneOffsetInHours: this.props.timeZoneOffsetInHours,
+                selectedDate: new Date(),
+                selectedUser: "",
+                selectedPlace: ""
+            };
+        },
 
-        this.props.navigator.push({
-            title: 'Pick User',
-            sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
-            component: UserList,
-            navigationBar: <NavigationBar
-                title="Pick Tutor" />,
-            passProps: {handleSelectedRow: this.handleSelectedUser}
-        })
-    },
+        showUserPicker: function () {
 
-    handleSelectedPlace: function (_selectedPlace) {
-        this.setState({
-            selectedPlace: _selectedPlace
-        });
-    },
+            this.props.navigator.push({
+                title: 'Pick User',
+                sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
+                component: UserList,
+                navigationBar: <NavigationBar title="Pick Tutor"/>,
+                passProps: {handleSelectedRow: this.handleSelectedUser}
+            })
+        },
 
-    handleSelectedUser: function (_selectedUser) {
-        this.setState({
-            selectedUser: _selectedUser
-        });
-    },
+        handleSelectedPlace: function (_selectedPlace) {
+            this.setState({
+                selectedPlace: _selectedPlace
+            });
+        },
 
-    handleSelectedDate: function (_selectedDate) {
-        this.setState({
-            selectedDate: _selectedDate
-        });
-    },
+        handleSelectedUser: function (_selectedUser) {
+            this.setState({
+                selectedUser: _selectedUser
+            });
+        },
 
-    showPlacePicker: function () {
+        handleSelectedDate: function (_selectedDate) {
+            this.setState({
+                selectedDate: _selectedDate
+            });
+        },
 
-        this.props.navigator.push({
-            title: 'Pick User',
-            sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
-            component: PlaceList,
-            navigationBar: <NavigationBar
-                title="Pick Tutor Location" />,
-            passProps: {handleSelectedRow: this.handleSelectedPlace}
-        })
-    },
+        showPlacePicker: function () {
 
-    showDatePicker: function () {
+            this.props.navigator.push({
+                title: 'Pick User',
+                sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
+                component: PlaceList,
+                navigationBar: <NavigationBar
+                    title="Pick Tutor Location"/>,
+                passProps: {handleSelectedRow: this.handleSelectedPlace}
+            })
+        },
 
-        this.props.navigator.push({
-            title: 'Pick Date',
-            sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
-            component: DatePickerView,
-            navigationBar: <NavigationBar
-                title="Initial View" />,
-            passProps: {handleSelectedDate: this.handleSelectedDate}
-        })
-    },
+        showDatePicker: function () {
 
-    displayUserName: function (_user) {
-        return _user ? _user.first_name + " " + _user.last_name : null;
-    },
+            this.props.navigator.push({
+                title: 'Pick Date',
+                sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
+                component: DatePickerView,
+                navigationBar: <NavigationBar
+                    title="Initial View"/>,
+                passProps: {handleSelectedDate: this.handleSelectedDate}
+            })
+        },
 
-    saveNewSession: function () {
+        displayUserName: function (_user) {
+            return _user ? _user.first_name + " " + _user.last_name : null;
+        },
 
-    },
+        /**
+         * helper function to save the newly created session
+         */
+        processSession: function () {
+            var self = this;
 
-    render: function () {
-        //  alert(JSON.stringify(this.state.annotations));
-        return (
-            <View style={styles.view}>
-                <InputLabelPanel label="Session Name" text={this.props} />
-                <TextLabelPanel label="Session Tutor" text={this.displayUserName(this.state.selectedUser) || ""}   __onPress={this.showUserPicker} />
-                <TextLabelPanel label="Session Location" text={this.state.selectedPlace.Name + ""}   __onPress={this.showPlacePicker} />
-                <TextLabelPanel label="Session Time" text={this.state.selectedDate + ""}  __onPress={this.showDatePicker} />
-                <InputLabelPanel label="Notes" text={this.props} />
-                <Button
-                    onPress={() => this.saveNewSession()}
-                    label="Save New Session" />
-            </View>
-        )
-    }
-});
+            var promise = ParseReact.Mutation.Create('TutorSession', {
+                note: 'Parse <3 React',
+                place: self.state.selectedPlace.id,
+                tutor: self.state.selectedUser.id,
+                suggestedDate: self.state.selectedDate,
+                user: Parse.User.current()
+            }).dispatch();
+
+
+            // handle promise results
+            promise.then(function (obj) {
+                // the object was saved successfully.
+                console.log(obj);
+                self.props.navigator.pop();
+            }, function (error) {
+                // the save failed.
+                alert("ERROR\n" + JSON.stringify(error));
+            });
+        },
+
+        /**
+         * save the information to a new session object in Parse after
+         * checking if the user is logged in or not
+         */
+        saveNewSession: function () {
+            var self = this;
+
+            if (Parse.User.current()) {
+                self.processSession();
+            } else {
+
+                // @TODO remove when authentication is integrated
+                Parse.User.logIn("user", "password", {
+                    success: function (user) {
+                        console.log(user);
+                        self.processSession();
+                    },
+                    error: function (user, error) {
+                        // The login failed. Check error to see why.
+                        alert("User Not Logged In");
+                    }
+                });
+            }
+        },
+
+        render: function () {
+            //  alert(JSON.stringify(this.state.annotations));
+            return (
+                <View style={styles.view}>
+                    <InputLabelPanel label="Session Name" text={this.props}/>
+                    <TextLabelPanel label="Session Tutor" text={this.displayUserName(this.state.selectedUser) || ""}
+                                    __onPress={this.showUserPicker}/>
+                    <TextLabelPanel label="Session Location" text={this.state.selectedPlace.Name + ""}
+                                    __onPress={this.showPlacePicker}/>
+                    <TextLabelPanel label="Session Time" text={this.state.selectedDate + ""}
+                                    __onPress={this.showDatePicker}/>
+                    <InputLabelPanel label="Notes" text={this.props}/>
+                    <Button
+                        onPress={() => this.saveNewSession()}
+                        label="Save New Session"/>
+                </View>
+            )
+        }
+    })
+    ;
 
 var styles = StyleSheet.create({
     view: {
