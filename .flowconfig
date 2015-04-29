@@ -18,9 +18,11 @@
 # Ignore jest
 .*/react-native/node_modules/jest-cli/.*
 
+.*/node_modules/.*
+
 [include]
 
-[libs]
+[library]
 node_modules/react-native/Libraries/react-native/react-native-interface.js
 
 [options]

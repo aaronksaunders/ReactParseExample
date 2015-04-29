@@ -11,7 +11,7 @@ var {
     Navigator,
     } = React;
 
-var NavigationBar = require('react-native-navbar');
+var NavigationBar = require('../Components/ModifiedReactNavBar');
 var DatePickerView = require('../Components/DatePickerView');
 
 var DatePickerModal = React.createClass({

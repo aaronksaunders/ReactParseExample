@@ -28,7 +28,7 @@ var {
     } = React;
 
 Parse.initialize(ParseConfiguration.applicationId, ParseConfiguration.javascriptKey);
-var NavigationBar = require('react-native-navbar');
+var NavigationBar = require('../Components/ModifiedReactNavBar');
 
 var PlaceListView = React.createClass({
     getInitialState: function () {

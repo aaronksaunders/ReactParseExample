@@ -7,7 +7,7 @@
 'use strict';
 
 var React = require('react-native');
-var NavigationBar = require('react-native-navbar');
+var NavigationBar = require('./App/Components/ModifiedReactNavBar');
 
 var SessionList = require('./App/Components/SessionList');
 var CreateSession = require('./App/Components/CreateSession');
@@ -26,22 +26,30 @@ var styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'white'
-    },
+    }
 });
 
 class ReactParseExample extends React.Component {
 
+    /**
+     * opens the next component Create Session to allow the user to create a
+     * new Tutoring Session
+     *
+     * @TODO move this out of root component
+     */
     addNewSession() {
+        /*
         this.refs.nav.push({
             component: CreateSession,
             sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
             navigationBar: <NavigationBar
-                onNext = {() => this.refs.nav.pop()}
-                nextTitle = "Cancel"
-                hidePrev = "true"
-                title ='New Session' />,
+                onNext={() => this.refs.nav.pop()}
+                nextTitle="Cancel"
+                hidePrev="true"
+                title='New Session'/>,
             passProps: {session: {}}
         });
+        */
     }
 
     renderScene(route, navigator) {
@@ -54,8 +62,8 @@ class ReactParseExample extends React.Component {
 
         return (
             <View style={styles.container}>
-        {navBar}
-                <Component {...route.passProps}  navigator={navigator} route={route} />
+                {navBar}
+                <Component {...route.passProps} navigator={navigator} route={route}/>
             </View>
         );
     }
@@ -73,13 +81,13 @@ class ReactParseExample extends React.Component {
                     return Navigator.SceneConfigs.FloatFromRight;
                 }}
                 initialRoute={{
-                    component: SessionList,
-                    rightButtonTitle: 'New Session',
-                    navigationBar: <NavigationBar
-                        onNext = {() => this.addNewSession()}
-                        nextTitle = "Create Session"
-                        title ='Tutor Manager' />
-                }} />
+                component: SessionList,
+                rightButtonTitle: 'New Session',
+                navigationBar: <NavigationBar
+                    onNext = {() => this.addNewSession()}
+                    nextTitle = "Create Session"
+                    title ='Tutor Manager' />
+            }}/>
         );
     }
 }

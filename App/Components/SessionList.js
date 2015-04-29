@@ -7,10 +7,15 @@
 'use strict';
 
 var React = require('react-native');
+var mixInEventEmitter = require('mixInEventEmitter');
+var NavigationBar = require('../Components/ModifiedReactNavBar');
+
+
 var Parse = require('parse').Parse;
 var ParseReact = require('parse-react');
 
 var SessionDetail = require('../Components/SessionDetail');
+var CreateSession = require('../Components/CreateSession');
 
 var ParseConfiguration = {
     'applicationId': "GRIoAKWUExfsT1q37Uyt66h4Lmx9ovvBAv2qigIw",
@@ -24,6 +29,7 @@ var {
     TouchableHighlight,
     ActivityIndicatorIOS,
     Text,
+    Navigator,
     View,
     } = React;
 
@@ -39,19 +45,31 @@ var MessageList = React.createClass({
         };
     },
 
-    onSelect: function (session) {
 
-        if (true) {
-            this.props.navigator.push({
-                //title: this.getTitle(earthquake.humanReadableLocation),
-                component: SessionDetail,
-                passProps: {session: session, navigator: this.props.navigator},
-                navigationBar: <NavigationBar
-                    title ='Session Detail' />
-            });
-        } else {
-            //  ReactElement.render();
-        }
+    componentDidMount: function () {
+        var self = this;
+
+        mixInEventEmitter(MessageList, {updateList: true});
+
+        self.addListener('updateList', function (volume) {
+            console.log('updateList was called');
+        });
+
+    },
+    onSelect: function (session) {
+        var self = this;
+
+        self.props.navigator.push({
+            component: SessionDetail,
+            passProps: {
+                session: session,
+                navigator: self.props.navigator,
+                parent: self
+            },
+            navigationBar: <NavigationBar
+                onPrev={() => self.props.navigator.pop()}
+                title='Session Detail'/>
+        });
 
     },
 
@@ -59,12 +77,12 @@ var MessageList = React.createClass({
         console.log(session);
         var t = session.tutor;
         var u = session.user;
-        var p = session.place
+        var p = session.place;
         return (
             <TouchableHighlight onPress={ () => this.onSelect(session)}>
                 <View style={styles.row}>
-                    <Text  style={styles.listText_large} >{u.first_name + " " + u.last_name}</Text>
-                    <Text style={styles.listText_large} >{t.first_name + " " + t.last_name}</Text>
+                    <Text style={styles.listText_large}>{u.first_name + " " + u.last_name}</Text>
+                    <Text style={styles.listText_large}>{t.first_name + " " + t.last_name}</Text>
                     <Text style={styles.listText}>{p.Name + " " + p.Location}</Text>
                 </View>
             </TouchableHighlight>
@@ -76,7 +94,7 @@ var MessageList = React.createClass({
             <ListView
                 ref="listview"
                 dataSource={this.state.dataSource}
-                renderRow={this.renderRow} />
+                renderRow={this.renderRow}/>
         )
     }
 
@@ -87,16 +105,14 @@ var SessionList = React.createClass({
 
     mixins: [ParseReact.Mixin],
 
-    addNewSession: function () {
-        alert("Clicked Add New Session");
-    },
+
     observe: function () {
         return {
             tutorSessions: (new Parse.Query("TutorSession").include(["place,tutor,user"]))
         };
     },
 
-    _refresh: function() {
+    _refresh: function () {
         this.refreshQueries('tutorSessions');
     },
 
@@ -113,13 +129,45 @@ var SessionList = React.createClass({
     },
 
     componentDidMount: function () {
-        this.setState({
-            dataSource: this.state.dataSource.cloneWithRows(
-                this.data.tutorSessions
+        var self = this;
+
+        self.props.navigator.onNext = function () {
+            alert("clicked on next");
+            self.addNewSession();
+        };
+
+        // Does NOT work!!
+        //self.props.navigator.route.navigationBar.props.onNext= function () {
+        //    alert("clicked on next - navigationBar.props");
+        //};
+
+        mixInEventEmitter(SessionList, {updateList: true});
+
+        self.addListener('updateList', function () {
+            console.log('updateList was called');
+        });
+
+        self.setState({
+            dataSource: self.state.dataSource.cloneWithRows(
+                self.data.tutorSessions
             )
         });
     },
 
+    addNewSession() {
+        var self = this;
+
+        self.props.navigator.push({
+            component: CreateSession,
+            sceneConfig: Navigator.SceneConfigs.FloatFromBottom,
+            navigationBar: <NavigationBar
+                onNext={() => self.props.navigator.pop()}
+                nextTitle="Cancel"
+                hidePrev="true"
+                title='New Session'/>,
+            passProps: {session: {}, parent:self}
+        });
+    },
 
     render: function () {
 
@@ -131,12 +179,13 @@ var SessionList = React.createClass({
             return (
                 <View style={[styles.container, styles.centerText]}>
                     <ActivityIndicatorIOS
-                        style={[styles.centering, {backgroundColor: '#eeeeee', height: 40}]} />
+                        style={[styles.centering, {backgroundColor: '#eeeeee', height: 40}]}/>
                 </View>
             )
         } else {
             console.log("Drawing List " + this.data.tutorSessions.length);
             return (<MessageList
+                ref="messageList"
                 navigator={this.props.navigator}
                 dataArray={this.data.tutorSessions}/>)
         }

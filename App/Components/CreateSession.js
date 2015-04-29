@@ -31,15 +31,7 @@ var DatePickerView = require('../Components/DatePickerView');
 var PlaceList = require('../Components/PlaceList');
 var UserList = require('../Components/UserList');
 var Button = require('../Components/Button');
-var NavigationBar = require('react-native-navbar');
-
-
-var ParseConfiguration = {
-    'applicationId': "GRIoAKWUExfsT1q37Uyt66h4Lmx9ovvBAv2qigIw",
-    'javascriptKey': "VVKntpb3zNpAgAhcEJHapDwKMVUKhIdX5QG0PVxf"
-};
-
-Parse.initialize(ParseConfiguration.applicationId, ParseConfiguration.javascriptKey);
+var NavigationBar = require('../Components/ModifiedReactNavBar');
 
 
 var CreateSession = React.createClass({
@@ -57,7 +49,8 @@ var CreateSession = React.createClass({
                 timeZoneOffsetInHours: this.props.timeZoneOffsetInHours,
                 selectedDate: new Date(),
                 selectedUser: "",
-                selectedPlace: ""
+                selectedPlace: "",
+                isMutating: false
             };
         },
 
@@ -114,8 +107,15 @@ var CreateSession = React.createClass({
             })
         },
 
+        componentWillMount: function () {
+
+            var self = this;
+
+        },
+
         displayUserName: function (_user) {
             return _user ? _user.first_name + " " + _user.last_name : null;
+
         },
 
         /**
@@ -137,11 +137,17 @@ var CreateSession = React.createClass({
             promise.then(function (obj) {
                 // the object was saved successfully.
                 console.log(obj);
+
+                self.parent.emit('updateList', {});
+
                 self.props.navigator.pop();
+            }).always(function () {
+                self.setState({isMutating: false});
             }, function (error) {
                 // the save failed.
                 alert("ERROR\n" + JSON.stringify(error));
             });
+            self.setState({isMutating: false});
         },
 
         /**
@@ -151,19 +157,22 @@ var CreateSession = React.createClass({
         saveNewSession: function () {
             var self = this;
 
+            self.props.parent.emit('updateList', {});
+            return;
+
             if (Parse.User.current()) {
                 self.processSession();
             } else {
 
                 // @TODO remove when authentication is integrated
-                Parse.User.logIn("user", "password", {
+                Parse.User.logIn("username", "password", {
                     success: function (user) {
                         console.log(user);
                         self.processSession();
                     },
                     error: function (user, error) {
                         // The login failed. Check error to see why.
-                        alert("User Not Logged In");
+                        alert("User Not Logged In: " + error.message);
                     }
                 });
             }
@@ -171,21 +180,29 @@ var CreateSession = React.createClass({
 
         render: function () {
             //  alert(JSON.stringify(this.state.annotations));
-            return (
-                <View style={styles.view}>
-                    <InputLabelPanel label="Session Name" text={this.props}/>
-                    <TextLabelPanel label="Session Tutor" text={this.displayUserName(this.state.selectedUser) || ""}
-                                    __onPress={this.showUserPicker}/>
-                    <TextLabelPanel label="Session Location" text={this.state.selectedPlace.Name + ""}
-                                    __onPress={this.showPlacePicker}/>
-                    <TextLabelPanel label="Session Time" text={this.state.selectedDate + ""}
-                                    __onPress={this.showDatePicker}/>
-                    <InputLabelPanel label="Notes" text={this.props}/>
-                    <Button
-                        onPress={() => this.saveNewSession()}
-                        label="Save New Session"/>
-                </View>
-            )
+            var content;
+
+            if (this.state.isMutating) {
+                content = ( <ActivityIndicatorIOS/> );
+            } else {
+                content = (
+                    <View style={styles.view}>
+                        <InputLabelPanel label="Session Name" text={this.props}/>
+                        <TextLabelPanel label="Session Tutor" text={this.displayUserName(this.state.selectedUser) || ""}
+                                        __onPress={this.showUserPicker}/>
+                        <TextLabelPanel label="Session Location" text={this.state.selectedPlace.Name + ""}
+                                        __onPress={this.showPlacePicker}/>
+                        <TextLabelPanel label="Session Time" text={this.state.selectedDate + ""}
+                                        __onPress={this.showDatePicker}/>
+                        <InputLabelPanel label="Notes" text={this.props}/>
+                        <Button
+                            onPress={() => this.saveNewSession()}
+                            label="Save New Session"/>
+                    </View>
+                );
+            }
+            return content;
+
         }
     })
     ;
