@@ -22,15 +22,39 @@ var Form = t.form.Form;
 
 // here we are: define your domain model
 var Person = t.struct({
-    name: t.Str,              // a required string
-    surname: t.Str,  // an optional string
+    firstName: t.Str,              // a required string
+    lastName: t.Str,  // an optional string
     email: t.Str,  // an optional string
+    password: t.Str,  // an optional string
+    passwordConfirm: t.Str,  // an optional string
 });
 
 var options = {
     fields: {
-        birthDate: {
-            mode: "date",
+        firstName: {
+            label: "First Name",
+            returnKeyType: "next"
+        },
+        lastName: {
+            label: "Last Name",
+            returnKeyType: "next"
+        },
+        email: {
+            returnKeyType: "next"
+        },
+        passwordConfirm: {
+            label: "Password Confirmation",
+            password: true,
+            returnKeyType: "next"
+        },
+        password: {
+            password: true,
+            returnKeyType: "next"
+        },
+        passwordConfirm: {
+            label: "Password Confirmation",
+            password: true,
+            returnKeyType: "go"
         }
     }
 }; // optional rendering options (see documentation)
@@ -51,9 +75,18 @@ var CreateAccountScreen = React.createClass({
     onPress: function () {
         // call getValue() to get the values of the form
         var value = this.refs.form.getValue();
+
+        // hide keyboard
+        this.refs.form.getComponent('firstName').blur();
+
+
         if (value) { // if validation fails, value will be null
             alert(JSON.stringify(value)); // value here is an instance of Person
         }
+    },
+
+    componentWillUnmount : function(){
+        alert("componentWillUnmount");
     },
 
     render: function () {
@@ -65,14 +98,11 @@ var CreateAccountScreen = React.createClass({
                         ref="form"
                         type={Person}
                         options={options}
-                        value={{
-              birthDate : this.props.date
-            }}
                         />
-                    <TouchableHighlight style={styles.button} onPress={this.onPress} underlayColor='#99d9f4'>
+                    <TouchableHighlight style={[styles.button, styles.buttonOk]} onPress={this.onPress}>
                         <Text style={styles.buttonText}>Save</Text>
                     </TouchableHighlight>
-                    <TouchableHighlight style={styles.button} onPress={this.onCancel} underlayColor='#99d9f4'>
+                    <TouchableHighlight style={[styles.button, styles.buttonCancel]} onPress={this.onCancel}>
                         <Text style={styles.buttonText}>Cancel</Text>
                     </TouchableHighlight>
                 </View>
@@ -84,8 +114,9 @@ var CreateAccountScreen = React.createClass({
 var styles = StyleSheet.create({
     container: {
         justifyContent: 'center',
-        marginTop: 50,
-        padding: 20,
+        //marginTop: 10,
+        paddingLeft: 20,
+        paddingRight: 20,
         backgroundColor: '#ffffff',
     },
     title: {
@@ -97,6 +128,14 @@ var styles = StyleSheet.create({
         fontSize: 18,
         color: 'white',
         alignSelf: 'center'
+    },
+    buttonCancel: {
+        backgroundColor: '#b51a00',
+        borderColor: '#b51a00',
+    },
+    buttonOk: {
+        backgroundColor: '#108b5b',
+        borderColor: '#108b5b',
     },
     button: {
         height: 36,
