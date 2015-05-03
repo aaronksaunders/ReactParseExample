@@ -7,9 +7,12 @@
   },
   "dependencies": {
     "react-native": "^0.4.0",
-    "react-native-navbar" : "*",
-    "parse" : "*",
-    "parse-react" : "*",
-    "moment" : "*"
+    "react-native-navbar": "*",
+    "parse": "*",
+    "parse-react": "*",
+    "moment": "*",
+    "react-timer-mixin": "^0.13.1"
+  },
+  "devDependencies": {
   }
 }
