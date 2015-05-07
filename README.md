@@ -7,5 +7,5 @@ This a sample project user React Native to build a simple application to manage 
 * Have incorpotated [ParsePlatform/ParseReact](https://github.com/ParsePlatform/ParseReact) in the solution for data storage
 * Have incorpotated [ParsePlatform/ParseReact](https://github.com/ParsePlatform/ParseReact) in the solution for user account creation and login
 * Using Maps Native Module to show locations
-* Using [tcomb-react-forms](https://github.com/gcanti/tcomb-form) for login and user account creation
+* Using [tcomb-form-native](https://github.com/gcanti/tcomb-form-native) for login and user account creation
 
